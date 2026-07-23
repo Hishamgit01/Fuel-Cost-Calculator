@@ -1,6 +1,5 @@
 # Fuel-Cost-Calculator
 A sleek, Apple-inspired Fuel &amp; Trip Utility Web App to calculate fuel costs, split expenses, track mileage, compare EV savings, and share summaries.
-Here is a clean, comprehensive, and professional **README.md** file in English for your **FuelCalc** project. You can copy and paste this directly into your GitHub repository!
 
 ---
 
