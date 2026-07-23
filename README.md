@@ -42,7 +42,7 @@ A sleek, Apple-inspired **Fuel & Trip Utility Web App** designed to help users c
 Designed & Developed with ❤️ by **Muhammed Hisham P**
 
 * **Portfolio:** [Visit Portfolio](https://hisham-portfolio-nu.vercel.app/)
-* **GitHub:** [@your-username](https://github.com/Hishamgit01)
+* **GitHub:** [Hishamgit0](https://github.com/Hishamgit01)
 
 ---
 
