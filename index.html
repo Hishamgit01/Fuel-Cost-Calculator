@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Cost & Mileage Calculator</title>
+    <meta name="description" content="A premium calculator for estimating trip costs and vehicle mileage.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        darkBg: '#0f172a',
+                        darkCard: 'rgba(30, 41, 59, 0.7)',
+                        lightBg: '#f8fafc',
+                        lightCard: 'rgba(255, 255, 255, 0.7)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 transition-colors duration-300 min-h-screen flex flex-col items-center justify-center gap-6 p-4 antialiased">
+    
+    <!-- Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 dark:bg-primary/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-secondary/20 dark:bg-secondary/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <main class="relative z-10 w-full max-w-md glass-card rounded-3xl shadow-2xl overflow-hidden border border-white/20 dark:border-white/10">
+        
+        <!-- Header -->
+        <header class="p-6 border-b border-slate-200/50 dark:border-slate-700/50 flex justify-between items-center">
+            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                <i class="fa-solid fa-gas-pump mr-2 text-primary"></i>FuelCalc
+            </h1>
+            <button id="themeToggle" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900" aria-label="Toggle Theme">
+                <i class="fa-solid fa-moon text-slate-600 dark:text-slate-300 hidden dark:block" id="moonIcon"></i>
+                <i class="fa-solid fa-sun text-slate-600 dark:text-slate-300 block dark:hidden" id="sunIcon"></i>
+            </button>
+        </header>
+
+        <!-- Tabs -->
+        <nav class="flex p-2 bg-slate-100/50 dark:bg-slate-800/50">
+            <button class="tab-btn active flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all" data-target="tab-trip">
+                Trip Cost
+            </button>
+            <button class="tab-btn flex-1 py-2 px-4 rounded-xl text-sm font-medium transition-all text-slate-500 hover:text-slate-800 dark:hover:text-slate-200" data-target="tab-mileage">
+                Mileage
+            </button>
+        </nav>
+
+        <div class="p-6 pb-10 relative h-auto">
+            <!-- Tab 1: Trip Cost Calculator -->
+            <section id="tab-trip" class="tab-content block active transition-all duration-500">
+                <div class="space-y-5">
+                    
+                    <!-- Trip Mode Switcher (Fuel vs EV) -->
+                    <div class="flex p-1 bg-slate-200/50 dark:bg-slate-700/50 rounded-xl">
+                        <button id="tripFuelBtn" class="flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition-all bg-white dark:bg-slate-800 text-primary shadow-sm">
+                            <i class="fa-solid fa-gas-pump mr-1"></i> Fuel
+                        </button>
+                        <button id="tripEvBtn" class="flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition-all text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+                            <i class="fa-solid fa-charging-station mr-1"></i> EV
+                        </button>
+                    </div>
+
+                    <!-- Inputs -->
+                    <div class="input-group">
+                        <label for="distance" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Total Distance (km)</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-route text-slate-400"></i>
+                            </div>
+                            <input type="number" id="distance" class="w-full pl-10 pr-4 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-slate-400" placeholder="e.g., 150">
+                        </div>
+                    </div>
+                    
+                    <!-- Fuel Specific Inputs -->
+                    <div id="tripFuelGroup" class="grid grid-cols-2 gap-4 block">
+                        <div class="input-group">
+                            <label for="mileage" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Mileage (km/L)</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-gauge text-slate-400"></i>
+                                </div>
+                                <input type="number" id="mileage" class="w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-slate-400" placeholder="e.g., 15">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="price" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Fuel Price (₹)</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-indian-rupee-sign text-slate-400"></i>
+                                </div>
+                                <input type="number" id="price" class="w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-slate-400" placeholder="105" value="105">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EV Specific Inputs -->
+                    <div id="tripEvGroup" class="grid grid-cols-2 gap-4 hidden">
+                        <div class="input-group">
+                            <label for="evCapacity" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Battery (kWh)</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-car-battery text-slate-400"></i>
+                                </div>
+                                <input type="number" id="evCapacity" class="w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-slate-400" placeholder="e.g., 50">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="evRange" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Range (km)</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-bolt text-slate-400"></i>
+                                </div>
+                                <input type="number" id="evRange" class="w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-slate-400" placeholder="e.g., 400">
+                            </div>
+                        </div>
+                        <div class="input-group col-span-2">
+                            <label for="evRate" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Electricity Rate (₹/kWh)</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-plug text-slate-400"></i>
+                                </div>
+                                <input type="number" id="evRate" class="w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-slate-400" placeholder="e.g., 8">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Split Expenses & Trip Type -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="input-group">
+                            <label for="passengers" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Passengers</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-users text-slate-400"></i>
+                                </div>
+                                <input type="number" id="passengers" class="w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder-slate-400" placeholder="1" value="1" min="1">
+                            </div>
+                        </div>
+                        <div class="flex flex-col justify-end">
+                            <div class="flex items-center justify-between p-3 bg-white/40 dark:bg-slate-800/40 rounded-xl border border-slate-200/50 dark:border-slate-700/50 h-[42px] mb-[1px]">
+                                <span class="text-sm font-medium text-slate-600 dark:text-slate-300">Round Trip</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="roundTrip" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 dark:peer-focus:ring-primary/30 rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-3 pt-2">
+                        <button id="resetTrip" class="px-4 py-2.5 rounded-xl font-medium text-slate-600 dark:text-slate-300 bg-slate-200/50 dark:bg-slate-700/50 hover:bg-slate-300/50 dark:hover:bg-slate-600/50 transition-colors w-1/3">Reset</button>
+                        <button id="calcTripBtn" class="px-4 py-2.5 rounded-xl font-medium text-white bg-primary hover:bg-indigo-600 transition-all shadow-lg shadow-primary/30 w-2/3 transform hover:-translate-y-0.5">Calculate</button>
+                    </div>
+                    
+                    <!-- Result Box -->
+                    <div id="tripResult" class="result-box hidden mt-4 p-4 bg-gradient-to-br from-indigo-50 to-emerald-50 dark:from-indigo-900/30 dark:to-emerald-900/30 rounded-2xl border border-indigo-100 dark:border-indigo-800/50 transform transition-all duration-500 scale-95 opacity-0">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Estimated Cost</h3>
+                            <div class="flex gap-2">
+                                <button id="saveTripBtn" class="w-8 h-8 rounded-full bg-white/80 dark:bg-slate-800/80 text-primary hover:bg-primary hover:text-white transition-colors flex items-center justify-center shadow-sm" title="Save Trip"><i class="fa-solid fa-bookmark"></i></button>
+                                <button id="copyTripBtn" class="w-8 h-8 rounded-full bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center shadow-sm" title="Copy Summary"><i class="fa-solid fa-copy"></i></button>
+                                <button id="shareTripBtn" class="w-8 h-8 rounded-full bg-white/80 dark:bg-slate-800/80 text-green-500 hover:bg-green-500 hover:text-white transition-colors flex items-center justify-center shadow-sm" title="Share via WhatsApp"><i class="fa-brands fa-whatsapp text-lg"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-end gap-2 mb-4">
+                            <span class="text-4xl font-bold text-slate-800 dark:text-white" id="tripCostValue">₹0</span>
+                            <span class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 pb-0.5" id="tripCostLabel">Total</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div class="bg-white/60 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+                                <p class="text-slate-500 dark:text-slate-400 text-xs mb-1" id="tripFuelLabel">Fuel Needed</p>
+                                <p class="font-semibold text-slate-700 dark:text-slate-200" id="tripFuelValue">0 L</p>
+                            </div>
+                            <div class="bg-white/60 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-200/50 dark:border-slate-700/50" id="roundTripDetails">
+                                <p class="text-slate-500 dark:text-slate-400 text-xs mb-1">One-Way</p>
+                                <p class="font-semibold text-slate-700 dark:text-slate-200" id="oneWayCostValue">₹0</p>
+                            </div>
+                            <div class="bg-white/60 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-200/50 dark:border-slate-700/50 hidden col-span-2" id="perPersonDetails">
+                                <div class="flex justify-between items-center">
+                                    <p class="text-slate-500 dark:text-slate-400 text-xs mb-1">Per Person Cost</p>
+                                    <i class="fa-solid fa-user-group text-slate-400 text-xs"></i>
+                                </div>
+                                <p class="font-semibold text-primary dark:text-indigo-400 text-lg" id="perPersonCostValue">₹0</p>
+                            </div>
+                            <div class="bg-emerald-100/60 dark:bg-emerald-900/30 p-2.5 rounded-lg border border-emerald-200/50 dark:border-emerald-800/50 hidden col-span-2" id="evSavingsDetails">
+                                <div class="flex justify-between items-center">
+                                    <p class="text-emerald-600 dark:text-emerald-400 text-xs mb-1 font-medium">Estimated Savings vs Petrol</p>
+                                    <i class="fa-solid fa-leaf text-emerald-500 text-xs"></i>
+                                </div>
+                                <p class="font-semibold text-emerald-700 dark:text-emerald-300" id="evSavingsValue">₹0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 2: Mileage Calculator -->
+            <section id="tab-mileage" class="tab-content hidden transition-all duration-500">
+                <div class="space-y-5">
+                    
+                    <!-- Mode Switcher -->
+                    <div class="flex p-1 bg-slate-200/50 dark:bg-slate-700/50 rounded-xl">
+                        <button id="modeLitersBtn" class="flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition-all bg-white dark:bg-slate-800 text-secondary shadow-sm">
+                            By Liters
+                        </button>
+                        <button id="modeAmountBtn" class="flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition-all text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+                            By Amount (₹)
+                        </button>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="milDistance" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Distance Driven (km)</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-road text-slate-400"></i>
+                            </div>
+                            <input type="number" id="milDistance" class="w-full pl-10 pr-4 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all placeholder-slate-400" placeholder="e.g., 300">
+                        </div>
+                    </div>
+                    
+                    <div id="milFuelGroup" class="input-group block">
+                        <label for="milFuel" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Fuel Consumed (Liters)</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-fill-drip text-slate-400"></i>
+                            </div>
+                            <input type="number" id="milFuel" class="w-full pl-10 pr-4 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all placeholder-slate-400" placeholder="e.g., 20">
+                        </div>
+                    </div>
+
+                    <div id="milAmountGroup" class="grid grid-cols-2 gap-4 hidden">
+                        <div class="input-group">
+                            <label for="milAmount" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Total Spent (₹)</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-indian-rupee-sign text-slate-400"></i>
+                                </div>
+                                <input type="number" id="milAmount" class="w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all placeholder-slate-400" placeholder="e.g., 2000">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="milPrice" class="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-400">Fuel Price (₹/L)</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-tag text-slate-400"></i>
+                                </div>
+                                <input type="number" id="milPrice" class="w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-slate-900/50 border border-slate-300/50 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all placeholder-slate-400" placeholder="105" value="105">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-3 pt-2">
+                        <button id="resetMil" class="px-4 py-2.5 rounded-xl font-medium text-slate-600 dark:text-slate-300 bg-slate-200/50 dark:bg-slate-700/50 hover:bg-slate-300/50 dark:hover:bg-slate-600/50 transition-colors w-1/3">Reset</button>
+                        <button id="calcMilBtn" class="px-4 py-2.5 rounded-xl font-medium text-white bg-secondary hover:bg-emerald-600 transition-all shadow-lg shadow-secondary/30 w-2/3 transform hover:-translate-y-0.5">Calculate</button>
+                    </div>
+
+                    <!-- Result Box -->
+                    <div id="milResult" class="result-box hidden mt-4 p-5 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-2xl border border-emerald-100 dark:border-emerald-800/50 transform transition-all duration-500 scale-95 opacity-0 text-center relative overflow-hidden">
+                        
+                        <div id="milStatusBg" class="absolute top-0 right-0 w-24 h-24 rounded-bl-full bg-emerald-500/10 dark:bg-emerald-500/20 -mr-4 -mt-4"></div>
+                        
+                        <h3 class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Calculated Mileage</h3>
+                        
+                        <div class="flex flex-col items-center justify-center gap-1 mb-2">
+                            <span class="text-5xl font-bold text-slate-800 dark:text-white" id="milValue">0</span>
+                            <span class="text-sm font-medium text-slate-500 dark:text-slate-400">km/L</span>
+                        </div>
+                        
+                        <div class="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full bg-white/60 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/50">
+                            <div id="milStatusDot" class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                            <span id="milStatusText" class="text-xs font-semibold text-slate-700 dark:text-slate-300">Excellent</span>
+                        </div>
+                        
+                        <p id="milEquivalentNote" class="mt-4 text-xs font-medium text-slate-500 dark:text-slate-400 hidden">
+                            Equivalent to ~<span id="milEquivalentValue">0</span> Liters
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Recent Calculations -->
+    <section class="w-full max-w-md mt-6 glass-card rounded-3xl shadow-lg border border-white/20 dark:border-white/10 overflow-hidden relative z-10 hidden" id="historySection">
+        <div class="p-5 border-b border-slate-200/50 dark:border-slate-700/50 flex justify-between items-center">
+            <h2 class="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center">
+                <i class="fa-solid fa-clock-rotate-left mr-2 text-primary"></i>Recent Trips
+            </h2>
+            <button id="clearHistoryBtn" class="text-xs font-medium text-slate-500 hover:text-red-500 transition-colors">Clear</button>
+        </div>
+        <div id="historyList" class="p-3 max-h-64 overflow-y-auto space-y-2">
+            <!-- Dynamic items go here -->
+            <p class="text-center text-sm text-slate-500 dark:text-slate-400 p-4" id="emptyHistoryMsg">No recent trips saved.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-md mt-8 mb-4 text-center relative z-10 flex flex-col items-center gap-1.5">
+        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">
+            Designed & Developed by <span class="text-slate-700 dark:text-slate-300">Muhammed Hisham P</span>
+        </p>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">© 2026 FuelCalc</p>
+        <a href="https://hisham-portfolio-nu.vercel.app/" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 text-xs font-semibold text-primary dark:text-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-md">
+            Visit Portfolio <i class="fa-solid fa-arrow-right-long text-[10px] group-hover:translate-x-1 transition-transform"></i>
+        </a>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
