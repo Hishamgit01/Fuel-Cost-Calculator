@@ -42,6 +42,28 @@
 </head>
 <body class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 transition-colors duration-300 min-h-screen flex flex-col items-center justify-center gap-6 p-4 antialiased">
     
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-xl transition-opacity duration-500">
+        <div id="splashContent" class="flex flex-col items-center transform scale-90 opacity-0 transition-all duration-700 ease-out">
+            <div class="relative mb-4">
+                <div class="absolute inset-0 bg-primary/40 dark:bg-primary/30 blur-xl rounded-full"></div>
+                <i class="fa-solid fa-gas-pump text-6xl text-primary relative z-10 drop-shadow-lg"></i>
+            </div>
+            <h1 class="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary tracking-tight">FuelCalc</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-10 tracking-wide uppercase">Smart Trip & Utility Tool</p>
+            
+            <!-- Loading line -->
+            <div class="w-48 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-primary to-secondary rounded-full splash-loader"></div>
+            </div>
+        </div>
+        
+        <!-- Bottom Credit -->
+        <div class="absolute bottom-8 left-0 right-0 text-center opacity-0 transition-opacity duration-700 delay-300" id="splashCredit">
+            <p class="text-xs text-slate-400 dark:text-slate-500 font-medium tracking-widest uppercase">Created by Muhammed Hisham P</p>
+        </div>
+    </div>
+
     <!-- Background Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 dark:bg-primary/10 rounded-full blur-3xl"></div>

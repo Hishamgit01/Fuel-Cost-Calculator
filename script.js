@@ -1,4 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Splash Screen ---
+    const splashScreen = document.getElementById('splashScreen');
+    const splashContent = document.getElementById('splashContent');
+    const splashCredit = document.getElementById('splashCredit');
+    
+    if (splashScreen && splashContent) {
+        // Trigger fade in and scale up on load
+        setTimeout(() => {
+            splashContent.classList.remove('scale-90', 'opacity-0');
+            splashContent.classList.add('scale-100', 'opacity-100');
+            
+            if (splashCredit) {
+                splashCredit.classList.remove('opacity-0');
+            }
+        }, 50);
+
+        // Hide splash screen after 2 seconds
+        setTimeout(() => {
+            splashScreen.classList.add('opacity-0');
+            setTimeout(() => {
+                splashScreen.remove();
+            }, 500); // Wait for fade-out transition (500ms duration)
+        }, 2000);
+    }
+
     // --- Theme Management ---
     const themeToggle = document.getElementById('themeToggle');
     const htmlElement = document.documentElement;
